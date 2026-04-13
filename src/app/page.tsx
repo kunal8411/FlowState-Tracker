@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useHydration } from "@/hooks/useHydration";
+import { useIdleDetection } from "@/hooks/useIdleDetection";
 import TimerDisplay from "@/components/timer/TimerDisplay";
 import StopModal from "@/components/timer/StopModal";
 import DailySummary from "@/components/logs/DailySummary";
@@ -11,6 +12,8 @@ import { Timer, Zap } from "lucide-react";
 export default function Home() {
   const hydrated = useHydration();
   const [showStopModal, setShowStopModal] = useState(false);
+
+  useIdleDetection();
 
   // Avoid hydration mismatch — show a loading skeleton until client hydrates
   if (!hydrated) {
