@@ -3,6 +3,10 @@
 import { useState, useEffect } from "react";
 import { useTaskStore } from "@/store/useTaskStore";
 
+/**
+ * Custom hook that provides a real-time elapsed seconds counter
+ * based on the active session's start time.
+ */
 export function useTimer() {
   const activeSession = useTaskStore((state) => state.activeSession);
   const [elapsed, setElapsed] = useState(0);
@@ -13,14 +17,9 @@ export function useTimer() {
       return;
     }
 
-    if (activeSession.isPaused) {
-      setElapsed(activeSession.accumulatedTime);
-      return;
-    }
-
+    // Calculate immediately on mount (handles tab return)
     const calcElapsed = () =>
-      activeSession.accumulatedTime +
-      Math.floor((Date.now() - activeSession.lastResumeTime) / 1000);
+      Math.floor((Date.now() - activeSession.startTime) / 1000);
 
     setElapsed(calcElapsed());
 
@@ -29,13 +28,11 @@ export function useTimer() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeSession, activeSession?.isPaused, activeSession?.accumulatedTime]);
+  }, [activeSession]);
 
   return {
     elapsed,
-    isRunning: !!activeSession && !activeSession.isPaused,
-    isPaused: !!activeSession?.isPaused,
-    hasActiveSession: !!activeSession,
+    isRunning: !!activeSession,
     startTime: activeSession?.startTime ?? null,
   };
 }
